@@ -1,5 +1,6 @@
 ---
-
+import Dashboard from '../components/Dashboard.jsx';
+import '../styles/global.css';
 ---
 
 <html lang="en">
@@ -8,9 +9,10 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>Analytics Dashboard</title>
+		<meta name="description" content="Modern analytics dashboard with interactive charts and data visualization" />
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<Dashboard client:load />
 	</body>
 </html>

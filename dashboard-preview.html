@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - Preview</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/recharts@2.8.0/esm/index.js" type="module"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .feather {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="module">
+        // Simple icon components (replacing react-icons)
+        const FiUsers = () => React.createElement('svg', { className: 'feather', viewBox: '0 0 24 24' },
+            React.createElement('path', { d: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2' }),
+            React.createElement('circle', { cx: '9', cy: '7', r: '4' }),
+            React.createElement('path', { d: 'm22 21-3-3' })
+        );
+        
+        const FiStar = () => React.createElement('svg', { className: 'feather', viewBox: '0 0 24 24' },
+            React.createElement('polygon', { points: '12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26' })
+        );
+        
+        const FiTrendingUp = () => React.createElement('svg', { className: 'feather', viewBox: '0 0 24 24' },
+            React.createElement('polyline', { points: '23,6 13.5,15.5 8.5,10.5 1,18' }),
+            React.createElement('polyline', { points: '17,6 23,6 23,12' })
+        );
+        
+        const FiBriefcase = () => React.createElement('svg', { className: 'feather', viewBox: '0 0 24 24' },
+            React.createElement('rect', { x: '2', y: '7', width: '20', height: '14', rx: '2', ry: '2' }),
+            React.createElement('path', { d: 'M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16' })
+        );
+        
+        const FiMoon = () => React.createElement('svg', { className: 'feather', viewBox: '0 0 24 24' },
+            React.createElement('path', { d: 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z' })
+        );
+        
+        const FiSun = () => React.createElement('svg', { className: 'feather', viewBox: '0 0 24 24' },
+            React.createElement('circle', { cx: '12', cy: '12', r: '5' }),
+            React.createElement('line', { x1: '12', y1: '1', x2: '12', y2: '3' }),
+            React.createElement('line', { x1: '12', y1: '21', x2: '12', y2: '23' }),
+            React.createElement('line', { x1: '4.22', y1: '4.22', x2: '5.64', y2: '5.64' }),
+            React.createElement('line', { x1: '18.36', y1: '18.36', x2: '19.78', y2: '19.78' }),
+            React.createElement('line', { x1: '1', y1: '12', x2: '3', y2: '12' }),
+            React.createElement('line', { x1: '21', y1: '12', x2: '23', y2: '12' }),
+            React.createElement('line', { x1: '4.22', y1: '19.78', x2: '5.64', y2: '18.36' }),
+            React.createElement('line', { x1: '18.36', y1: '5.64', x2: '19.78', y2: '4.22' })
+        );
+
+        // Sample data
+        const surveyData = [
+            { id: 1, respondent: "Alex Johnson", role: "Developer", experience: 5, satisfaction: 8, date: "2024-01-15" },
+            { id: 2, respondent: "Sarah Chen", role: "Designer", experience: 3, satisfaction: 9, date: "2024-01-16" },
+            { id: 3, respondent: "Mike Wilson", role: "Manager", experience: 8, satisfaction: 7, date: "2024-01-17" },
+            { id: 4, respondent: "Emma Davis", role: "Developer", experience: 2, satisfaction: 8, date: "2024-01-18" },
+            { id: 5, respondent: "Tom Rodriguez", role: "QA Engineer", experience: 4, satisfaction: 9, date: "2024-01-19" }
+        ];
+
+        // Simple Dashboard Component
+        const Dashboard = () => {
+            const [darkMode, setDarkMode] = React.useState(false);
+            
+            const stats = React.useMemo(() => {
+                const totalResponses = surveyData.length;
+                const avgExperience = surveyData.reduce((sum, item) => sum + item.experience, 0) / totalResponses;
+                const avgSatisfaction = surveyData.reduce((sum, item) => sum + item.satisfaction, 0) / totalResponses;
+                
+                const roleCounts = surveyData.reduce((acc, item) => {
+                    acc[item.role] = (acc[item.role] || 0) + 1;
+                    return acc;
+                }, {});
+                const topRole = Object.entries(roleCounts).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+
+                return {
+                    totalResponses,
+                    avgExperience: avgExperience.toFixed(1),
+                    avgSatisfaction: avgSatisfaction.toFixed(1),
+                    topRole
+                };
+            }, []);
+
+            const StatCard = ({ icon: Icon, title, value, color }) => 
+                React.createElement('div', {
+                    className: `${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6 shadow-sm transition-all duration-200 hover:shadow-md`
+                },
+                    React.createElement('div', { className: 'flex items-center justify-between' },
+                        React.createElement('div', {},
+                            React.createElement('p', {
+                                className: `text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`
+                            }, title),
+                            React.createElement('p', {
+                                className: `text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} mt-2`
+                            }, value)
+                        ),
+                        React.createElement('div', { className: `p-3 rounded-full ${color}` },
+                            React.createElement(Icon, { className: 'h-6 w-6 text-white' })
+                        )
+                    )
+                );
+
+            return React.createElement('div', {
+                className: `min-h-screen transition-colors duration-200 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`
+            },
+                React.createElement('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8' },
+                    // Header
+                    React.createElement('div', { className: 'flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8' },
+                        React.createElement('div', {},
+                            React.createElement('h1', {
+                                className: `text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`
+                            }, 'Analytics Dashboard'),
+                            React.createElement('p', {
+                                className: `mt-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`
+                            }, 'Survey insights and analytics overview')
+                        ),
+                        React.createElement('button', {
+                            onClick: () => setDarkMode(!darkMode),
+                            className: `mt-4 sm:mt-0 p-3 rounded-lg transition-colors duration-200 ${
+                                darkMode 
+                                    ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700' 
+                                    : 'bg-white text-gray-600 hover:bg-gray-100'
+                            } border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`
+                        }, React.createElement(darkMode ? FiSun : FiMoon, { className: 'h-5 w-5' }))
+                    ),
+                    
+                    // Statistics Cards
+                    React.createElement('div', { className: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8' },
+                        React.createElement(StatCard, {
+                            icon: FiUsers,
+                            title: "Total Responses",
+                            value: stats.totalResponses,
+                            color: "bg-blue-500"
+                        }),
+                        React.createElement(StatCard, {
+                            icon: FiTrendingUp,
+                            title: "Avg. Experience",
+                            value: `${stats.avgExperience} yrs`,
+                            color: "bg-green-500"
+                        }),
+                        React.createElement(StatCard, {
+                            icon: FiStar,
+                            title: "Avg. Satisfaction",
+                            value: `${stats.avgSatisfaction}/10`,
+                            color: "bg-yellow-500"
+                        }),
+                        React.createElement(StatCard, {
+                            icon: FiBriefcase,
+                            title: "Top Role",
+                            value: stats.topRole,
+                            color: "bg-purple-500"
+                        })
+                    ),
+                    
+                    // Placeholder for charts
+                    React.createElement('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-6' },
+                        React.createElement('div', {
+                            className: `${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6 shadow-sm`
+                        },
+                            React.createElement('h3', {
+                                className: `text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} mb-4`
+                            }, 'Satisfaction by Respondent'),
+                            React.createElement('div', { className: 'h-64 flex items-center justify-center' },
+                                React.createElement('p', {
+                                    className: `${darkMode ? 'text-gray-400' : 'text-gray-600'}`
+                                }, 'Chart will render here with Recharts')
+                            )
+                        ),
+                        React.createElement('div', {
+                            className: `${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6 shadow-sm`
+                        },
+                            React.createElement('h3', {
+                                className: `text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} mb-4`
+                            }, 'Role Distribution'),
+                            React.createElement('div', { className: 'h-64 flex items-center justify-center' },
+                                React.createElement('p', {
+                                    className: `${darkMode ? 'text-gray-400' : 'text-gray-600'}`
+                                }, 'Pie chart will render here')
+                            )
+                        )
+                    )
+                )
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(React.createElement(Dashboard), document.getElementById('root'));
+    </script>
+</body>
+</html>

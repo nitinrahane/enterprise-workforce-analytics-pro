@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "respondent": "Alex Johnson",
+    "role": "Developer",
+    "experience": 5,
+    "satisfaction": 8,
+    "date": "2024-01-15"
+  },
+  {
+    "id": 2,
+    "respondent": "Sarah Chen",
+    "role": "Designer",
+    "experience": 3,
+    "satisfaction": 9,
+    "date": "2024-01-16"
+  },
+  {
+    "id": 3,
+    "respondent": "Mike Wilson",
+    "role": "Manager",
+    "experience": 8,
+    "satisfaction": 7,
+    "date": "2024-01-17"
+  },
+  {
+    "id": 4,
+    "respondent": "Emma Davis",
+    "role": "Developer",
+    "experience": 2,
+    "satisfaction": 8,
+    "date": "2024-01-18"
+  },
+  {
+    "id": 5,
+    "respondent": "Tom Rodriguez",
+    "role": "QA Engineer",
+    "experience": 4,
+    "satisfaction": 9,
+    "date": "2024-01-19"
+  },
+  {
+    "id": 6,
+    "respondent": "Lisa Park",
+    "role": "Designer",
+    "experience": 6,
+    "satisfaction": 8,
+    "date": "2024-01-20"
+  },
+  {
+    "id": 7,
+    "respondent": "David Kim",
+    "role": "Developer",
+    "experience": 7,
+    "satisfaction": 9,
+    "date": "2024-01-21"
+  },
+  {
+    "id": 8,
+    "respondent": "Anna Martinez",
+    "role": "Manager",
+    "experience": 10,
+    "satisfaction": 7,
+    "date": "2024-01-22"
+  },
+  {
+    "id": 9,
+    "respondent": "James Brown",
+    "role": "QA Engineer",
+    "experience": 3,
+    "satisfaction": 8,
+    "date": "2024-01-23"
+  },
+  {
+    "id": 10,
+    "respondent": "Sophie Taylor",
+    "role": "Developer",
+    "experience": 1,
+    "satisfaction": 9,
+    "date": "2024-01-24"
+  }
+]
