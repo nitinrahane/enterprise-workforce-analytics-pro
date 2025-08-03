@@ -1,9 +1,9 @@
 # 🏢 Enterprise Workforce Analytics Pro
 
-A **professional-grade employee analytics dashboard** built with modern web technologies. This comprehensive platform provides enterprise-level workforce insights, performance tracking, and data-driven HR analytics.
+A **professional-grade employee analytics dashboard** built with modern web technologies by **Nitin Rahane**. This comprehensive platform provides enterprise-level workforce insights, performance tracking, and data-driven HR analytics.
 
 ![Analytics Dashboard](https://img.shields.io/badge/Status-Production%20Ready-green)
-![Version](https://img.shields.io/badge/Version-1.0.0-blue)
+![Version](https://img.shields.io/badge/Version-1.0.1-blue)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ## ✨ Features
