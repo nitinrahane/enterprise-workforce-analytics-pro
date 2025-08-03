@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   BarChart, 
   Bar, 
@@ -33,7 +33,8 @@ import {
   FiUserCheck,
   FiSettings,
   FiDownload,
-  FiRefreshCw
+  FiRefreshCw,
+  FiSearch
 } from 'react-icons/fi';
 import enhancedData from '../data/enhanced-survey.json';
 import KPICard from './KPICard.jsx';
@@ -42,6 +43,8 @@ import DataTable from './DataTable.jsx';
 import PerformanceRadar from './PerformanceRadar.jsx';
 import Header from './Header.jsx';
 import Footer from './Footer.jsx';
+import SettingsModal from './SettingsModal.jsx';
+import SearchModal from './SearchModal.jsx';
 
 // Hook for localStorage with SSR safety
 const useLocalStorage = (key, initialValue) => {
@@ -77,6 +80,24 @@ const Dashboard = () => {
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [selectedPeriod, setSelectedPeriod] = useState('all');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [settings, setSettings] = useLocalStorage('dashboardSettings', {
+    general: {
+      autoRefresh: true,
+      showTrends: true,
+      enableExport: true
+    },
+    display: {
+      compactView: false,
+      showAnimations: true
+    },
+    notifications: {
+      email: true,
+      desktop: false,
+      performance: true
+    }
+  });
 
   // Filter data based on selections
   const filteredData = useMemo(() => {
@@ -89,6 +110,49 @@ const Dashboard = () => {
     // Add period filtering logic here if needed
     return filtered;
   }, [selectedDepartment, selectedPeriod]);
+
+  // Auto-refresh functionality
+  useEffect(() => {
+    if (settings.general.autoRefresh) {
+      const interval = setInterval(() => {
+        handleRefresh();
+      }, 300000); // 5 minutes
+      return () => clearInterval(interval);
+    }
+  }, [settings.general.autoRefresh]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      // Cmd/Ctrl + K for search
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+        event.preventDefault();
+        setIsSearchOpen(true);
+      }
+      // Cmd/Ctrl + , for settings
+      if ((event.metaKey || event.ctrlKey) && event.key === ',') {
+        event.preventDefault();
+        setIsSettingsOpen(true);
+      }
+      // Cmd/Ctrl + D for dark mode toggle
+      if ((event.metaKey || event.ctrlKey) && event.key === 'd') {
+        event.preventDefault();
+        setDarkMode(!darkMode);
+      }
+      // Escape to close modals
+      if (event.key === 'Escape') {
+        setIsSearchOpen(false);
+        setIsSettingsOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [darkMode, setDarkMode]);
+
+  const updateSettings = (newSettings) => {
+    setSettings(newSettings);
+  };
 
   // Calculate comprehensive KPIs
   const kpis = useMemo(() => {
@@ -236,20 +300,50 @@ const Dashboard = () => {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    // Simulate data refresh
+    // Simulate data refresh with realistic delay
     await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // In a real app, you would fetch new data here
+    // const newData = await fetchLatestData();
+    
     setIsRefreshing(false);
+    
+    // Show notification if enabled
+    if (settings.notifications.desktop && 'Notification' in window) {
+      new Notification('Analytics Pro', {
+        body: 'Dashboard data has been refreshed',
+        icon: '/favicon.svg'
+      });
+    }
   };
 
   const handleExport = () => {
-    // Export functionality
-    const dataStr = JSON.stringify(filteredData, null, 2);
+    if (!settings.general.enableExport) {
+      alert('Data export is disabled in settings');
+      return;
+    }
+    
+    // Enhanced export with multiple formats
+    const exportData = {
+      metadata: {
+        exported_at: new Date().toISOString(),
+        total_employees: filteredData.length,
+        department_filter: selectedDepartment,
+        version: '1.0.0'
+      },
+      summary: kpis,
+      employees: filteredData,
+      departments: departmentData
+    };
+    
+    const dataStr = JSON.stringify(exportData, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'employee-analytics.json';
+    link.download = `analytics-report-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
+    URL.revokeObjectURL(url);
   };
 
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#6366F1'];
@@ -274,7 +368,12 @@ const Dashboard = () => {
       darkMode ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
       {/* Professional Header */}
-      <Header darkMode={darkMode} onToggleDarkMode={() => setDarkMode(!darkMode)} />
+      <Header 
+        darkMode={darkMode} 
+        onToggleDarkMode={() => setDarkMode(!darkMode)}
+        onOpenSearch={() => setIsSearchOpen(true)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+      />
       
       {/* Main Dashboard Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -291,11 +390,35 @@ const Dashboard = () => {
             }`}>
               Real-time workforce insights and performance analytics
               {selectedDepartment !== 'all' && ` • ${selectedDepartment} Department`}
+              {settings.general.autoRefresh && (
+                <span className="ml-2 inline-flex items-center">
+                  <span className="h-2 w-2 bg-green-500 rounded-full animate-pulse mr-1"></span>
+                  Auto-refresh enabled
+                </span>
+              )}
             </p>
           </div>
           
           {/* Dashboard Controls */}
           <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+            {/* Quick Search Button */}
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className={`hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
+                darkMode 
+                  ? 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white hover:border-gray-600' 
+                  : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300'
+              }`}
+            >
+              <FiSearch className="h-4 w-4" />
+              <span>Search...</span>
+              <span className={`text-xs px-1.5 py-0.5 rounded ${
+                darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-500'
+              }`}>
+                ⌘K
+              </span>
+            </button>
+
             {/* Department Filter */}
             <div className="flex items-center gap-2">
               <FiFilter className={`h-4 w-4 ${
@@ -326,6 +449,7 @@ const Dashboard = () => {
                   ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white border-gray-700' 
                   : 'bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-gray-200'
               } border disabled:opacity-50 disabled:cursor-not-allowed`}
+              title={settings.general.autoRefresh ? 'Auto-refresh enabled' : 'Manual refresh'}
             >
               <FiRefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             </button>
@@ -333,11 +457,15 @@ const Dashboard = () => {
             {/* Export Button */}
             <button
               onClick={handleExport}
+              disabled={!settings.general.enableExport}
               className={`p-2 sm:p-3 rounded-lg transition-colors ${
-                darkMode 
-                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white border-gray-700' 
-                  : 'bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-gray-200'
+                settings.general.enableExport
+                  ? darkMode 
+                    ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white border-gray-700' 
+                    : 'bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-gray-200'
+                  : 'opacity-50 cursor-not-allowed'
               } border`}
+              title={settings.general.enableExport ? 'Export data' : 'Export disabled in settings'}
             >
               <FiDownload className="h-4 w-4" />
             </button>
@@ -717,6 +845,23 @@ const Dashboard = () => {
       
       {/* Professional Footer */}
       <Footer darkMode={darkMode} />
+
+      {/* Enterprise Modals */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        darkMode={darkMode}
+        onToggleDarkMode={() => setDarkMode(!darkMode)}
+        settings={settings}
+        onUpdateSettings={updateSettings}
+      />
+
+      <SearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        darkMode={darkMode}
+        data={enhancedData}
+      />
     </div>
   );
 };
