@@ -1,7 +1,8 @@
 {
-  "name": "analytics-dashboard",
+  "name": "enterprise-workforce-analytics-pro",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "description": "Professional enterprise-grade employee analytics dashboard with comprehensive workforce insights and performance tracking",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -23,5 +24,23 @@
   "devDependencies": {
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6"
+  },
+  "keywords": [
+    "analytics",
+    "dashboard",
+    "employee-metrics",
+    "workforce-analytics",
+    "hr-dashboard",
+    "performance-tracking",
+    "astro",
+    "react",
+    "tailwindcss",
+    "enterprise"
+  ],
+  "author": "Nitin",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/enterprise-workforce-analytics-pro.git"
   }
 }
