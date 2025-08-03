@@ -1,7 +1,7 @@
 {
   "name": "enterprise-workforce-analytics-pro",
   "type": "module",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Professional enterprise-grade employee analytics dashboard with comprehensive workforce insights and performance tracking",
   "scripts": {
     "dev": "astro dev",
